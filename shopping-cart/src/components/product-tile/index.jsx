@@ -1,41 +1,61 @@
-import React from 'react'
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../../store/slices/cart-slice';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, removeFromCart } from '../../store/slices/cart-slice';
+import { ShoppingCart, Trash2 } from 'lucide-react'; // İkonlar için
 
 function ProductTile({ product }) {
-
   const dispatch = useDispatch();
+  const cart = useSelector((state) => state.cart);
 
   function handleAddToCart() {
-    dispatch(addToCart(product))
+    dispatch(addToCart(product));
   }
 
+  function handleRemoveFromCart() {
+    dispatch(removeFromCart(product.id));
+  }
+
+  const isItemInCart = cart.some((item) => item.id === product.id);
+
   return (
-    <div>
-      <div className='group flex flex-col items-center border-2 border-red-900 gap-3 p-4 h-[360px] mt-5 rounded-xl overflow-hidden'>
+    <div className="group relative bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all duration-500 ease-in-out flex flex-col h-[420px]">
 
-        <div className='w-full h-48 overflow-hidden flex justify-center items-center'>
-          <img
-            src={product?.image}
-            alt={product?.title}
-            className='max-h-full max-w-full object-contain'
-          />
+      <div className="relative w-full h-48 mb-4 overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center p-6">
+        <img
+          src={product?.image}
+          alt={product?.title}
+          className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110"
+        />
+        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg shadow-sm border border-gray-100">
+          <span className="text-sm font-bold text-gray-900">${product?.price}</span>
         </div>
-
-        <h1 className='w-40 text-lg font-semibold text-center mt-8 truncate '>{product?.title}</h1>
-
-        <button onClick={handleAddToCart} className='mt-auto w-full bg-red-950 text-white rounded-lg px-4 py-2.5 font-semibold 
-        transition-all duration-300 transform active:scale-95
-        hover:bg-red-800 hover:shadow-lg hover:shadow-red-900/30
-        flex items-center justify-center gap-2'>
-          <svg xmlns="http://w3.org" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          Add to cart
-        </button>
       </div>
+
+      <div className="flex flex-col flex-grow">
+        <h1 className="text-gray-800 font-semibold text-base line-clamp-2 min-h-[3rem] leading-tight mb-2 group-hover:text-red-600 transition-colors">
+          {product?.title}
+        </h1>
+
+        <p className="text-xs text-gray-400 uppercase tracking-widest mb-4">
+          {product?.category || "Electronics"}
+        </p>
+      </div>
+
+      <button
+        onClick={isItemInCart ? handleRemoveFromCart : handleAddToCart}
+        className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300 transform active:scale-95 ${isItemInCart
+          ? 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100'
+          : 'bg-gray-900 text-white hover:bg-black shadow-md hover:shadow-gray-300'
+          }`}
+      >
+        {isItemInCart ? (
+          <> <Trash2 size={18} /> Remove </>
+        ) : (
+          <> <ShoppingCart size={18} /> Add to Cart </>
+        )}
+      </button>
     </div>
   );
 }
 
-export default ProductTile
+export default ProductTile;
